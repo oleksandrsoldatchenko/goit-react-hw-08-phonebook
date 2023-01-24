@@ -1,36 +1,61 @@
+import { lazy, useEffect } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { Layout } from './Header/Header';
+import { PrivateRoute } from './PrivateRoute/PrivateRoute';
+import { PublicRoute } from './PublicRoute/PublicRoute';
+import { useDispatch } from 'react-redux';
+import { current } from 'redux/auth/authThunk';
+import { NotFoundPage } from '../pages/NotFoundPage/NotFoundPage';
 
-import { Form } from './Form/Form';
-import { ContactList } from './ContactList/ContactList';
-import { Filter } from './Filter/Filter';
+const HomePage = lazy(() => import('../pages/HomePage/HomePage'));
+const ContactsPage = lazy(() => import('../pages/ContactsPage/ContactsPage'));
+const RegisterPage = lazy(() => import('../pages/RegisterPage/RegisterPage'));
+const LoginPage = lazy(() => import('../pages/LoginPage/LoginPage'));
 
-import { useFilter } from 'hooks/useFilter';
-import { useContacts } from 'hooks/useContacts';
+export const App = () => {
+  const dispatch = useDispatch();
 
-import { Container } from './App.styled';
-
-export function App() {
-  const [filter, onSetFilter] = useFilter();
-  const [contacts, onAddContact, onDeleteContact] = useContacts();
-
-  const empty = () => contacts.length > 0;
+  useEffect(() => {
+    dispatch(current());
+  }, [dispatch]);
 
   return (
-    <Container>
-      <h1>Phonebook</h1>
-      <Form onData={onAddContact} />
-      <h2>Contacts</h2>
-      <Filter value={filter} onChangeFilter={onSetFilter} />
-      {empty() ? (
-        <>
-          <ContactList contacts={contacts} onDeleteContact={onDeleteContact} />
-        </>
-      ) : (
-        <h3>
-          Phonebook is empty! <br /> Add your contacts.
-        </h3>
-      )}
+    <>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Navigate to="home"></Navigate>} />
+
+          <Route path="home" element={<HomePage />} />
+          <Route
+            path="register"
+            element={
+              <PublicRoute>
+                <RegisterPage />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="login"
+            element={
+              <PublicRoute>
+                <LoginPage />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="contacts"
+            element={
+              <PrivateRoute>
+                <ContactsPage />
+              </PrivateRoute>
+            }
+          />
+          <Route path="*" element={<NotFoundPage />} />
+        </Route>
+      </Routes>
+
       <Toaster position="top-center" reverseOrder={false} />
-    </Container>
+    </>
   );
-}
+};

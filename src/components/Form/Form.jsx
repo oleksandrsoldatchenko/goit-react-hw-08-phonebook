@@ -1,19 +1,15 @@
+import Button from '@mui/material/Button';
 import { useState } from 'react';
-import {
-  FieldItem,
-  ContaierField,
-  ContainerForm,
-  BtnDisabled,
-} from './Form.styled';
+import { ContainerForm, ContaierField, FieldItem } from './Form.styled';
 
 export function Form({ onData }) {
   const initialState = {
     name: '',
-    phone: '',
+    number: '',
   };
 
   const [state, setState] = useState({ ...initialState });
-  const { name, phone } = state;
+  const { name, number } = state;
 
   const handleChange = ({ target }) => {
     const { name, value } = target;
@@ -48,8 +44,8 @@ export function Form({ onData }) {
         Phone number
         <FieldItem
           type="tel"
-          name="phone"
-          value={phone}
+          name="number"
+          value={number}
           pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
           title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
           required
@@ -57,9 +53,14 @@ export function Form({ onData }) {
           onChange={handleChange}
         />
       </ContaierField>
-      <BtnDisabled type="submit" disabled={!name || !phone}>
+      <Button
+        variant="contained"
+        size="small"
+        type="submit"
+        disabled={!name || !number}
+      >
         Add contact
-      </BtnDisabled>
+      </Button>
     </ContainerForm>
   );
 }
